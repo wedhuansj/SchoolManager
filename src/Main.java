@@ -1,5 +1,10 @@
 import controller.SchoolController;
-void main() {
-    SchoolController s = new SchoolController();
-    s.start();
+import config.JDBCConnectionConfig;
+public class Main {
+    public static void main(String[] args) {
+        SchoolController s = new SchoolController();
+        JDBCConnectionConfig config = new JDBCConnectionConfig();
+        config.getConnection();
+        s.start();
+    }
 }

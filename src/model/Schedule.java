@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 public class Schedule {
     private String classId, subId, teacherId, room;
     private int day, slot;
@@ -11,6 +13,7 @@ public class Schedule {
         this.day = day;
         this.slot = slot;
     }
+
     public String getClassId() { return classId; }
     public int getDay() { return day; }
     public int getSlot() { return slot; }

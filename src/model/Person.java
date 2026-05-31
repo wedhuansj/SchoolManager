@@ -4,6 +4,7 @@ public abstract class Person {
     private String id, name;
     private int age;
     private String gender, address;
+    public Person() {}
     public Person(String id, String name, int age, String gender, String address) {
         this.id = id;
         this.name = name;
