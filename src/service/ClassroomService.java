@@ -1,60 +1,41 @@
 package service;
 
 import dao.ClassroomDAO;
-import dao.StudentDAO;
 import dao.TeacherDAO;
 import model.Classroom;
-import model.Student;
 import model.Teacher;
+import model.Student;
 import view.SchoolView;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ClassroomService {
-    public static void showList() {
-        List<Classroom> cls = ClassroomDAO.getListClassroom();
-        List<Teacher> teach = TeacherDAO.getListTeacher();
-        for (Classroom c : cls) {
-            String teacherName = "Chưa có";
-            for (Teacher t : teach) {
-                if (t.getId().equals(c.getHeadTeacherId())) {
-                    teacherName = t.getName();
-                    break;
-                }
-            }
-            int totalStudent = c.getStudentIds().size();
-            SchoolView.msg("Mã lớp: " + c.getId() + "\nTên lớp: " + c.getName() + "\nGVCN: " + teacherName + "\nSỉ số: " + totalStudent);
-        }
+    private final ClassroomDAO classroomDAO = new ClassroomDAO();
+    private final TeacherDAO teacherDAO = new TeacherDAO();
+    public void showList() {
+        showAllClass();
     }
-    public static void showStudentsInClass(String classId) {
-        List<Classroom> cls = ClassroomDAO.getListClassroom();
-        Classroom target = null;
-        for (Classroom c : cls) {
-            if (c.getId().equals(classId)) {
-                target = c;
-            }
-        }
-        if (target == null) {
-            SchoolView.msg("Không tìm thấy mã");
+    public void showStudentsInClass(String classId) {
+        Classroom data = classroomDAO.getStudents(classId);
+        if (data == null) {
+            SchoolView.msg("Lớp không tồn tại");
             return;
         }
-        List<String> studentIds = target.getStudentIds();
-        if (studentIds.isEmpty()) {
-            SchoolView.msg("Lớp học chưa có học sinh");
+        if (data.getStudentList().isEmpty()) {
+            SchoolView.msg("Lớp không có học sinh");
             return;
         }
-        List<Student> students = StudentDAO.getListStudent();
-        SchoolView.msg("Danh sách học sinh lớp " + target.getName());
-        for (String id : studentIds) {
-            for (Student s : students) {
-                if (id.equals(s.getId())) {
-                    SchoolView.msg("Mã HS: " + s.getId() + "\nTên: " + s.getName() + "\nTuổi: " + s.getAge());
-                }
-            }
+        System.out.println("\n--- DANH SÁCH HỌC SINH LỚP: " + classId.toUpperCase() + " ---");
+        System.out.println("-------------------------------------------------------------");
+        System.out.printf("%-10s %-25s %-10s\n", "Mã HS", "Họ tên", "Tuổi");
+        System.out.println("-------------------------------------------------------------");
+        for (Student s : data.getStudentList()) {
+            System.out.printf("%-10s %-25s %-10d\n", s.getId(), s.getName(), s.getAge());
         }
+        System.out.println("-------------------------------------------------------------");
+        SchoolView.pressEnter();
     }
-    public static boolean addNewClass(String id, String name, String teacherId) {
-        List<Classroom> cls = ClassroomDAO.getListClassroom();
+    public boolean addNewClass(String id, String name, String teacherId) {
+        List<Classroom> cls = classroomDAO.getListClassroom();
         for (Classroom c : cls) {
             if (c.getId().equals(id)) {
                 SchoolView.msg("Mã lớp đã tồn tại");
@@ -63,17 +44,21 @@ public class ClassroomService {
         }
         Classroom newClass = new Classroom(id, name);
         newClass.setHeadTeacherId(teacherId);
-        ClassroomDAO.addClassroom(newClass);
+        classroomDAO.addClassroom(newClass);
         SchoolView.msg("Tạo lớp thành công");
         return true;
     }
-    public static void showAllClass() {
-        List<Classroom> cls = ClassroomDAO.getListClassroom();
-        List<Teacher> teach = TeacherDAO.getListTeacher();
+    public void showAllClass() {
+        List<Classroom> cls = classroomDAO.getListClassroom();
+        List<Teacher> teach = teacherDAO.getListTeacher();
         if (cls.isEmpty()) {
             SchoolView.msg("Danh sách lớp học trống!");
             return;
         }
+        System.out.println("\n--- DANH SÁCH LỚP HỌC ---");
+        System.out.println("----------------------------------------------------------------------");
+        System.out.printf("%-12s %-18s %-25s %-10s\n", "Mã lớp", "Tên lớp", "GVCN", "Sĩ số");
+        System.out.println("----------------------------------------------------------------------");
         for (Classroom c : cls) {
             String teacherName = "Chưa có";
             for (Teacher t : teach) {
@@ -83,7 +68,9 @@ public class ClassroomService {
                 }
             }
             int totalStudent = c.getStudentIds().size();
-            SchoolView.msg("Mã lớp: " + c.getId() + "\nTên lớp: " + c.getName() + "\nGVCN: " + teacherName + "\nSỉ số: " + totalStudent + "\n----------------");
+            System.out.printf("%-12s %-18s %-25s %-10d\n", c.getId(), c.getName(), teacherName, totalStudent);
         }
+        System.out.println("----------------------------------------------------------------------");
+        SchoolView.pressEnter();
     }
 }

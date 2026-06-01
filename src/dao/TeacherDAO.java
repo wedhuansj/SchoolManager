@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TeacherDAO {
-    public static void addTeacher(Teacher t) {
+    public  void addTeacher(Teacher t) {
         String sql = "INSERT INTO teacher (teacher_id, teacher_name, teacher_age, teacher_gender, teacher_address, teacher_salary, teacher_exp) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = JDBCConnectionConfig.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -24,7 +24,7 @@ public class TeacherDAO {
             ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
     }
-    public static void updateTeacher(Teacher t) {
+    public  void updateTeacher(Teacher t) {
         String sql = "UPDATE teacher SET teacher_name = ?, teacher_age = ?, teacher_gender = ?, teacher_address = ?, teacher_salary = ?, teacher_exp = ? WHERE teacher_id = ?";
         try (Connection con = JDBCConnectionConfig.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -38,7 +38,7 @@ public class TeacherDAO {
             ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
     }
-    public static List<Teacher> getListTeacher() {
+    public  List<Teacher> getListTeacher() {
         List<Teacher> teach = new ArrayList<>();
         String sql = "SELECT * FROM teacher";
         try (Connection con = JDBCConnectionConfig.getConnection();
@@ -58,7 +58,7 @@ public class TeacherDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return teach;
     }
-    public static void deleteTeacher(String id) {
+    public  void deleteTeacher(String id) {
         String sql = "DELETE FROM teacher WHERE teacher_id = ?";
         try (Connection con = JDBCConnectionConfig.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

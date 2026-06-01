@@ -1,14 +1,13 @@
 package dao;
 
 import model.Student;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import config.JDBCConnectionConfig;
 
 public class StudentDAO {
-    public static List<Student> getListStudent() {
+    public List<Student> getListStudent() {
         List<Student> students = new ArrayList<>();
         String sql = "SELECT * FROM student";
         try (Connection con = JDBCConnectionConfig.getConnection();
@@ -40,7 +39,7 @@ public class StudentDAO {
             ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
     }
-    public static void updateStudent(Student s) {
+    public void updateStudent(Student s) {
         String sql = "UPDATE student SET student_name = ?, student_age = ?, student_gender = ?, student_address = ? WHERE student_id = ?";
         try (Connection con = JDBCConnectionConfig.getConnection();
              PreparedStatement ps = con.prepareStatement(sql))
@@ -53,15 +52,40 @@ public class StudentDAO {
             ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
     }
-    public static void deleteStudent(String id) {
+    public void deleteStudent(String id) {
         String sql = "DELETE FROM student WHERE student_id = ?";
         try (Connection con = JDBCConnectionConfig.getConnection();
              PreparedStatement ps = con.prepareStatement(sql))
         {
             ps.setString(1, id);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+    public Student findById(String studentId) {
+        String sql = "SELECT * FROM student WHERE student_id=?";
+        try (Connection con = JDBCConnectionConfig.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql))
+        {
+            ps.setString(1, studentId);
+            try(ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    return mapSet(rs);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
+    }
+    private Student mapSet(ResultSet rs) throws SQLException {
+        Student s = new Student();
+        s.setId(rs.getString("student_id"));
+        s.setName(rs.getString("student_name"));
+        s.setAge(rs.getInt("student_age"));
+        s.setGender(rs.getString("student_gender"));
+        s.setAddress(rs.getString("student_address"));
+        s.setClassId(rs.getString("class_id"));
+        s.setMathScore(rs.getDouble("math_score"));
+        s.setLiteratureScore(rs.getDouble("literature_score"));
+        s.setEnglishScore(rs.getDouble("english_score"));
+        return s;
     }
 }

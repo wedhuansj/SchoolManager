@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SubjectDAO {
-    public static List<String> getSub(String teacherId) {
+    public  List<String> getSub(String teacherId) {
         List<String> subjects = new ArrayList<>();
         String sql = "SELECT sub_name FROM teacher_subjects WHERE teacher_id = ?";
         try (Connection con = JDBCConnectionConfig.getConnection();
@@ -32,7 +32,7 @@ public class SubjectDAO {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    public static void deleteTeacherSubjects(String teacherId) {
+    public  void deleteTeacherSubjects(String teacherId) {
         String sql = "DELETE FROM teacher_subjects WHERE teacher_id = ?";
         try (Connection con = JDBCConnectionConfig.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

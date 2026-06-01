@@ -4,31 +4,38 @@ import dao.TeacherDAO;
 import dao.SubjectDAO;
 import model.Teacher;
 import view.SchoolView;
-
 import java.util.List;
 
 public class TeacherService {
-    private static final TeacherDAO teacherDAO = new TeacherDAO();
-    private static final SubjectDAO subjectDAO = new SubjectDAO();
-    public static void showAllTeachers() {
+    private final TeacherDAO teacherDAO = new TeacherDAO();
+    private final SubjectDAO subjectDAO = new SubjectDAO();
+
+    public void showAllTeachers() {
         List<Teacher> list = teacherDAO.getListTeacher();
         if (list.isEmpty()) {
             SchoolView.msg("Danh sách giáo viên trống!");
             return;
         }
-        SchoolView.msg("Danh sách giáo viên");
+        System.out.println("\n--- DANH SÁCH GIÁO VIÊN ---");
+        System.out.println("-------------------------------------------------------------------------------------------");
+        System.out.printf("%-10s %-25s %-8s %-15s %-12s %-20s\n", "ID", "Tên giáo viên", "Tuổi", "Lương", "Kinh nghiệm", "Môn dạy");
+        System.out.println("-------------------------------------------------------------------------------------------");
         for (Teacher t : list) {
             List<String> subs = subjectDAO.getSub(t.getId());
             t.setSubjectNames(subs);
-            SchoolView.msg("ID: " + t.getId() +
-                    "\nTên: " + t.getName() +
-                    "\nTuổi: " + t.getAge() +
-                    "\nLương: " + t.getSalary() +
-                    "\nKinh nghiệm: " + t.getExp() + " năm" +
-                    "\nMôn dạy: " + t.getSubjectNames());
+            System.out.printf("%-10s %-25s %-8d %-15.2f %-12s %-20s\n",
+                    t.getId(),
+                    t.getName(),
+                    t.getAge(),
+                    t.getSalary(),
+                    t.getExp() + " năm",
+                    String.join(", ", t.getSubjectNames()));
         }
+        System.out.println("-------------------------------------------------------------------------------------------");
+        SchoolView.pressEnter();
     }
-    public static void addTeacher(Teacher t, List<String> subjects) {
+
+    public void addTeacher(Teacher t, List<String> subjects) {
         if (t.getAge() <= 0 || t.getSalary() < 0 || t.getExp() < 0) {
             SchoolView.msg("Thông tin không hợp lệ");
             return;
@@ -45,7 +52,8 @@ public class TeacherService {
         }
         SchoolView.msg("Thêm thành công");
     }
-    public static void addSubjectToTeacher(String teacherId, String subject) {
+
+    public void addSubjectToTeacher(String teacherId, String subject) {
         boolean exists = false;
         for (Teacher old : teacherDAO.getListTeacher()) {
             if (old.getId().equals(teacherId)) {
@@ -67,7 +75,8 @@ public class TeacherService {
         subjectDAO.addSub(teacherId, subject);
         SchoolView.msg("Phân công môn học mới thành công!");
     }
-    public static void deleteTeacher(String teacherId) {
+
+    public void deleteTeacher(String teacherId) {
         boolean exists = false;
         for (Teacher old : teacherDAO.getListTeacher()) {
             if (old.getId().equals(teacherId)) {

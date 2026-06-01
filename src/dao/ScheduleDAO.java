@@ -2,7 +2,6 @@ package dao;
 
 import config.JDBCConnectionConfig;
 import model.Schedule;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScheduleDAO {
-    public static List<Schedule> getListSchedule() {
+    public List<Schedule> getListSchedule() {
         List<Schedule> schedule = new ArrayList<>();
         String sql = "SELECT * FROM schedule";
         try (Connection con = JDBCConnectionConfig.getConnection();
@@ -25,7 +24,7 @@ public class ScheduleDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return schedule;
     }
-    public static void addSchedule(Schedule s) {
+    public void addSchedule(Schedule s) {
         String sql = "INSERT INTO schedule (class_id, sub_id, teacher_id, room, day, slot) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection con = JDBCConnectionConfig.getConnection();
              PreparedStatement ps = con.prepareStatement(sql))
@@ -40,7 +39,7 @@ public class ScheduleDAO {
         } catch (SQLException e) { e.printStackTrace(); }
     }
     public void updateSchedule(Schedule s) {
-        String sql = "UPDATE schedule SET sub_id = ?, teacher_id = ?, room = ? WHERE class_id = ?, day = ?, slot = ?";
+        String sql = "UPDATE schedule SET sub_id = ?, teacher_id = ?, room = ? WHERE class_id = ? AND day = ? AND slot = ?";
         try (Connection con = JDBCConnectionConfig.getConnection();
              PreparedStatement ps = con.prepareStatement(sql))
         {
@@ -53,8 +52,8 @@ public class ScheduleDAO {
             ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
     }
-    public static void deleteSchedule(Schedule s) {
-        String sql = "DELETE FROM schedule WHERE class_id = ?, day = ?, slot = ?";
+    public void deleteSchedule(Schedule s) {
+        String sql = "DELETE FROM schedule WHERE class_id = ? AND day = ? AND slot = ?";
         try (Connection con = JDBCConnectionConfig.getConnection();
              PreparedStatement ps = con.prepareStatement(sql))
         {
