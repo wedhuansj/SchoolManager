@@ -48,7 +48,7 @@ public class ScheduleService {
         }
     }
     public void deleteSchedule(Schedule s) {
-        scheduleDAO.deleteSchedule(s);
+        scheduleDAO.deleteSchedule(s.getClassId(), s.getDay(), s.getSlot());
         SchoolView.msg("Đã xóa");
     }
 }

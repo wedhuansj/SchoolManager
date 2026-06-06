@@ -1,13 +1,22 @@
 package model;
 
-import java.util.ArrayList;
+import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "classroom")
 public class Classroom {
+    @Id
+    @Column(name = "class_id")
     private  String id = "";
+    @Column(name = "class_name")
     private  String name;
+    @Column(name = "teacher_id")
     private String headTeacherId;
-    private  ArrayList<String> studentIds = new ArrayList<>();
-    private  ArrayList<Student> students = new ArrayList<>();
+    @OneToMany(mappedBy = "classroom")
+    private List<Student> students = new ArrayList<>();
     public Classroom() {}
     public Classroom(String id, String name) {
         this.id = id;
@@ -20,7 +29,6 @@ public class Classroom {
     public void setName(String name) { this.name = name; }
     public String getHeadTeacherId() { return headTeacherId; }
     public void setHeadTeacherId(String headTeacherId) { this.headTeacherId = headTeacherId; }
-    public  ArrayList<String> getStudentIds() { return studentIds; }
     public void setStudentList(ArrayList<Student> students) { this.students = students; }
-    public  ArrayList<Student> getStudentList() { return students; }
+    public  List<Student> getStudentList() { return students; }
 }

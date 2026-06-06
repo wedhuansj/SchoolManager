@@ -1,13 +1,33 @@
 package model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+
 import java.util.ArrayList;
 import java.util.List;
-
+@Entity
+@Table(name = "teacher")
 public class Teacher extends Person {
-    private List<String> subjectNames;
-    private String classId;
+    @Column(name = "teacher_id")
+    private String id;
+    @Column(name = "teacher_name")
+    private String name;
+    @Column(name = "teacher_age")
+    private int age;
+    @Column(name = "teacher_gender")
+    private String gender;
+    @Column(name = "teacher_address")
+    private String address;
+    @Column(name = "teacher_salary")
     private double salary;
+    @Column(name = "teacher_exp")
     private int exp;
+    @Transient
+    private List<String> subjectNames = new ArrayList<>();
+    @Transient
+    private String classId = "";
     public Teacher() { this.subjectNames = new ArrayList<>(); }
     public Teacher(String id, String name, int age, String gender, String address, double salary, int exp) {
         super(id, name, age, gender, address);

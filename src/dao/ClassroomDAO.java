@@ -1,81 +1,51 @@
 package dao;
 
-import config.JDBCConnectionConfig;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.TypedQuery;
 import model.Classroom;
-import model.Student;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import config.ORM;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClassroomDAO {
     public void addClassroom(Classroom c) {
-        String sql = "INSERT INTO classroom (class_id, class_name, teacher_id) VALUES (?, ?, ?)";
-        try (Connection con = JDBCConnectionConfig.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql))
-        {
-            ps.setString(1, c.getId());
-            ps.setString(2, c.getName());
-            ps.setString(3, c.getHeadTeacherId());
-            ps.executeUpdate();
-        } catch (SQLException e) { e.printStackTrace(); }
+        EntityManager em = ORM.emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.persist(c);
+            tx.commit();
+        }
+        catch (Exception e) {
+            if (tx != null && tx.isActive()) tx.rollback();
+            e.printStackTrace();
+        }
+        finally { em.close(); }
     }
     public List<Classroom> getListClassroom() {
-        List<Classroom> classroom = new ArrayList<>();
-        String sql = "SELECT * FROM classroom";
-        try (Connection con = JDBCConnectionConfig.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery())
-        {
-            while (rs.next()) {
-                Classroom classs = new Classroom(rs.getString("class_id"), rs.getString("class_name"));
-                classs.setHeadTeacherId(rs.getString("teacher_id"));
-                classroom.add(classs);
-                String sql2 = "SELECT student_id FROM student WHERE class_id = ?";
-                try (Connection con2 = JDBCConnectionConfig.getConnection();
-                     PreparedStatement ps2 = con2.prepareStatement(sql2)) {
-                    ps2.setString(1, classs.getId());
-                    ResultSet rs2 = ps2.executeQuery();
-                    while (rs2.next()) {
-                        String student_id = rs2.getString("student_id");
-                        classs.getStudentIds().add(student_id);
-                    }
-                }
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return classroom;
+        EntityManager em = ORM.emf.createEntityManager();
+        List<Classroom> list = new ArrayList<>();
+        try {
+            TypedQuery<Classroom> query = em.createQuery("SELECT DISTINCT c FROM Classroom c LEFT JOIN FETCH c.students", Classroom.class);
+            list = query.getResultList();
+        }
+        catch (Exception e) { e.printStackTrace(); }
+        finally { em.close(); }
+        return list;
     }
     public Classroom getStudents(String class_id) {
-        String sql = "select * from classroom c join student s on s.class_id = c.class_id where c.class_id = ?";
+        EntityManager em = ORM.emf.createEntityManager();
         Classroom c = null;
-        try (Connection con = JDBCConnectionConfig.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql))
-        {
-            ps.setString(1, class_id);
-            ResultSet rs = ps.executeQuery();
-            c = new Classroom();
-            ArrayList<Student> students = new ArrayList<>();
-            while (rs.next()) {
-                c.setId(rs.getString("class_id"));
-                c.setName(rs.getString("class_name"));
-                c.setHeadTeacherId(rs.getString("teacher_id"));
-                Student s = new Student();
-                s.setId(rs.getString("student_id"));
-                s.setName(rs.getString("student_name"));
-                s.setAge(rs.getInt("student_age"));
-                s.setGender(rs.getString("student_gender"));
-                s.setAddress(rs.getString("student_address"));
-                s.setClassId(rs.getString("class_id"));
-                s.setMathScore(rs.getDouble("math_score"));
-                s.setLiteratureScore(rs.getDouble("literature_score"));
-                s.setEnglishScore(rs.getDouble("english_score"));
-                students.add(s);
-            }
-            c.setStudentList(students);
-        } catch (SQLException e) { e.printStackTrace(); }
+        try {
+            TypedQuery<Classroom> query = em.createQuery("SELECT c FROM Classroom c LEFT JOIN FETCH c.students WHERE c.id = :classId", Classroom.class);
+            query.setParameter("classId", class_id);
+            c = query.getSingleResult();
+        }
+        catch (Exception e)  { e.printStackTrace(); }
+        finally { em.close(); }
         return c;
     }
 }

@@ -67,7 +67,7 @@ public class ClassroomService {
                     break;
                 }
             }
-            int totalStudent = c.getStudentIds().size();
+            int totalStudent = c.getStudentList().size();
             System.out.printf("%-12s %-18s %-25s %-10d\n", c.getId(), c.getName(), teacherName, totalStudent);
         }
         System.out.println("----------------------------------------------------------------------");
